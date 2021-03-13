@@ -6,6 +6,7 @@ import Container from '../components/Container';
 import styled from 'styled-components';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {clientsApi} from '../utils/api';
+import {Layout} from '../components/Layout/Layout';
 
 const AddClientScreen = ({navigation}) => {
   const [values, setValues] = useState({});
@@ -20,17 +21,23 @@ const AddClientScreen = ({navigation}) => {
   const onSubmit = () => {
     clientsApi
       .add(values)
-      .then(() => {
-        navigation.navigate('Home');
-        alert('Ok');
-      })
+      .then(
+        ({
+          data: {
+            data: {_id: id},
+          },
+        }) => {
+          navigation.navigate('Client', {id});
+          alert('Ok');
+        },
+      )
       .catch(() => {
         alert('Bad');
       });
   };
 
   return (
-    <View style={{flex: 1, justifyContent: 'center'}}>
+    <Layout navigation={navigation} justifyContent="center" scrollable={false}>
       <Container
         style={{
           flex: 1,
@@ -63,7 +70,7 @@ const AddClientScreen = ({navigation}) => {
           </Button>
         </ButtonView>
       </Container>
-    </View>
+    </Layout>
   );
 };
 

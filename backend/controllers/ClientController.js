@@ -1,7 +1,8 @@
 const {validationResult} = require("express-validator");
 const {Client} = require('../models');
 
-function ClientController() {}
+function ClientController() {
+}
 
 const create = function (req, res) {
     const errors = validationResult(req);
@@ -95,22 +96,23 @@ const show = async function (req, res) {
     const id = req.params.id;
     try {
         const client = await Client.findById(id)
-            .populate('appointments')
             .exec();
-        res.json({
+        console.log(client._doc);
+        return res.json({
             status: 'success',
-            data: {...client._doc, appointments: client.appointments}
+            data: client._doc
         });
-        } catch (e) {
+
+    } catch (e) {
         return res.status(404).json({
             success: false,
             message: 'CLIENT_NOT_FOUND'
         })
     }
-    }
+}
 
 const all = function (req, res) {
-     Client.find({}, function (err, docs) {
+    Client.find({}, function (err, docs) {
         if (err) {
             return res.status(500).json({
                 success: false,

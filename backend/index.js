@@ -17,6 +17,7 @@ app.get("/clients/:id", ClientCtrl.show);
 
 app.get('/appointments', AppointmentCtrl.all);
 app.post('/appointments',appointmentValidation.create, AppointmentCtrl.create);
+app.get("/appointments/:id", AppointmentCtrl.show);
 app.delete("/appointments/:id", AppointmentCtrl.remove);
 app.patch("/appointments/:id", appointmentValidation.update, AppointmentCtrl.update);
 

@@ -17,6 +17,6 @@ const Circle = styled.TouchableOpacity`
   background: #2a86ff;
   position: absolute;
   right: 25px;
-  bottom: 25px;
+  bottom: 70px;
 `;
 export default PlusButton;

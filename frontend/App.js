@@ -2,16 +2,17 @@ import React from 'react';
 import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
 import {
-  HomeScreen,
+  AppointmentsScreen,
   ClientScreen,
   AddClientScreen,
   AddAppointmentScreen,
+  ClientsScreen,
 } from './screens';
 
 const AppNavigator = createStackNavigator(
   {
-    Home: {
-      screen: HomeScreen,
+    Appointments: {
+      screen: AppointmentsScreen,
       navigationOptions: {
         title: 'Журнал клиентов',
         headerTintColor: '#2A86ff',
@@ -26,15 +27,21 @@ const AppNavigator = createStackNavigator(
     Client: {
       screen: ClientScreen,
     },
-    AddClient: {
-      screen: AddClientScreen,
+    Clients: {
+      screen: ClientsScreen,
+      navigationOptions: {
+        cardOverlayEnabled: false,
+      },
     },
     AddAppointment: {
       screen: AddAppointmentScreen,
     },
+    AddClient: {
+      screen: AddClientScreen,
+    },
   },
   {
-    initialRouteName: 'Home',
+    initialRouteName: 'Clients',
   },
 );
 

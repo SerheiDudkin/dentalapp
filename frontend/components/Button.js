@@ -7,7 +7,7 @@ const Button = ({children, color, onPress, style, iconName}) => (
     {iconName && (
       <Icon style={{marginRight: 10}} name={iconName} size={24} color="white" />
     )}
-    <ButtonText>{children}</ButtonText>
+    {children && <ButtonText>{children}</ButtonText>}
   </ButtonWrapper>
 );
 

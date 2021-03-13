@@ -3,101 +3,122 @@ import {ActivityIndicator, Text, View, Linking} from 'react-native';
 import styled from 'styled-components';
 import Icon from 'react-native-vector-icons/Ionicons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import {clientsApi} from '../utils/api';
+import {clientsApi, appointmentsApi} from '../utils/api';
 import {Badge, Button, Container, GrayText, PlusButton} from '../components';
+import {Layout} from '../components/Layout/Layout';
 
 const ClientScreen = ({navigation}) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingAppointments, setIsLoadingAppointments] = useState(true);
   const [appointments, setAppointments] = useState([]);
-  const [isloading, setIsLoading] = useState(true);
+  const [err, setErr] = useState(null);
+  const [client, setClient] = useState(null);
+  const clientId = navigation.getParam('id');
+
   useEffect(() => {
-    const id = navigation.getParam('user')._id;
+    setIsLoading(true);
     clientsApi
-      .show(id)
-      .then(({data}) => {
-        setAppointments(data.data.appointments);
-        setIsLoading(false);
-      })
-      .catch(() => {
-        setIsLoading(false);
-      });
-  }, [navigation]);
+      .show(clientId)
+      .then(({data: {data}}) => setClient(data))
+      .catch((error) => setErr(JSON.stringify(error)))
+      .finally(() => setIsLoading(false));
+  }, [clientId]);
 
+  useEffect(() => {
+    setIsLoadingAppointments(true);
+    appointmentsApi
+      .show(clientId)
+      .then(({data: {data}}) => setAppointments(data))
+      .catch((error) => setErr(JSON.stringify(error)))
+      .finally(setIsLoadingAppointments(false));
+  }, [clientId]);
+
+  console.log({client});
   return (
-    <View style={{flex: 1}}>
-      <ClientDetails>
-        <ClientFullName>
-          {navigation.getParam('user', {}).fullname}
-        </ClientFullName>
-        <GrayText>{navigation.getParam('user', {}).phone}</GrayText>
+    <Layout
+      navigation={navigation}
+      plusRoute="AddAppointment"
+      plusParams={{clientId}}>
+      {err && (
+        <View>
+          <Text>{err}</Text>
+        </View>
+      )}
+      {isLoading ? (
+        <ActivityIndicator size="large" color="2A86FF" />
+      ) : (
+        <>
+          <ClientDetails>
+            <ClientFullName>{client.fullname}</ClientFullName>
+            <GrayText>{client.phone}</GrayText>
 
-        <ClientButtons>
-          <FormulaButtonView>
-            <Button>Протокол приема</Button>
-          </FormulaButtonView>
-          <PhoneButtonView>
-            <Button
-              onPress={() =>
-                Linking.openURL('tel:' + navigation.getParam('user', {}).phone)
-              }
-              color="#84D269">
-              <Icon name="call" size={22} color={'white'} />
-            </Button>
-          </PhoneButtonView>
-        </ClientButtons>
-      </ClientDetails>
+            <ClientButtons>
+              <FormulaButtonView>
+                <Button>Протокол приема</Button>
+              </FormulaButtonView>
+              <PhoneButtonView>
+                <Button
+                  onPress={() => Linking.openURL('tel:' + client.phone)}
+                  color="#84D269">
+                  <Icon name="call" size={22} color={'white'} />
+                </Button>
+              </PhoneButtonView>
+            </ClientButtons>
+          </ClientDetails>
 
-      <ClientAppointments>
-        <Container>
-          {isloading ? (
-            <ActivityIndicator size="large" color="2A86FF" />
-          ) : (
-            appointments.map((appointment) => (
-              <AppointmentCard key={appointment._id}>
-                <MoreButton>
-                  <FontAwesome5
-                    name="bars"
-                    size={24}
-                    color="rgba(0, 0, 0, 0.4)"
-                  />
-                </MoreButton>
-                <AppointmentCardRow>
-                  <FontAwesome5
-                    name="pump-medical"
-                    size={22}
-                    color={'#A3A3A3'}
-                  />
-                  <AppointmentCardLabel>
-                    <Text style={{fontWeight: '600'}}>
-                      {appointment.diagnosis}
-                    </Text>
-                  </AppointmentCardLabel>
-                </AppointmentCardRow>
-                <AppointmentCardRow>
-                  <FontAwesome5
-                    name="briefcase-medical"
-                    size={22}
-                    color={'#A3A3A3'}
-                  />
-                  <AppointmentCardLabel>
-                    <Text style={{fontWeight: '600'}}>
-                      {appointment.diagnosis}
-                    </Text>
-                  </AppointmentCardLabel>
-                </AppointmentCardRow>
-                <AppointmentCardRow
-                  style={{marginTop: 15, justifyContent: 'space-between'}}>
-                  <Badge style={{width: 155}} active>
-                    {appointment.date} - {appointment.time}
-                  </Badge>
-                  <Badge color="green">{appointment.balance}</Badge>
-                </AppointmentCardRow>
-              </AppointmentCard>
-            ))
-          )}
-        </Container>
-      </ClientAppointments>
-      <PlusButton onPress={navigation.navigate.bind(this, 'AddAppointment')} />
-    </View>
+          <ClientAppointments>
+            {isLoadingAppointments && false ? (
+              <ActivityIndicator size="large" color="2A86FF" />
+            ) : (
+              <Container>
+                {appointments.map((appointment) => (
+                  <AppointmentCard key={appointment._id}>
+                    <MoreButton>
+                      <FontAwesome5
+                        name="bars"
+                        size={24}
+                        color="rgba(0, 0, 0, 0.4)"
+                      />
+                    </MoreButton>
+                    <AppointmentCardRow>
+                      <FontAwesome5
+                        name="pump-medical"
+                        size={22}
+                        color={'#A3A3A3'}
+                      />
+                      <AppointmentCardLabel>
+                        <Text style={{fontWeight: '600'}}>
+                          {appointment.diagnosis}
+                        </Text>
+                      </AppointmentCardLabel>
+                    </AppointmentCardRow>
+                    <AppointmentCardRow>
+                      <FontAwesome5
+                        name="briefcase-medical"
+                        size={22}
+                        color={'#A3A3A3'}
+                      />
+                      <AppointmentCardLabel>
+                        <Text style={{fontWeight: '600'}}>
+                          {appointment.diagnosis}
+                        </Text>
+                      </AppointmentCardLabel>
+                    </AppointmentCardRow>
+                    <AppointmentCardRow
+                      style={{marginTop: 15, justifyContent: 'space-between'}}>
+                      <Badge style={{width: 155}} active>
+                        {appointment.date} - {appointment.time}
+                      </Badge>
+                      <Badge color="green">{appointment.balance}</Badge>
+                    </AppointmentCardRow>
+                  </AppointmentCard>
+                ))}
+              </Container>
+            )}
+          </ClientAppointments>
+        </>
+      )}
+    </Layout>
   );
 };
 

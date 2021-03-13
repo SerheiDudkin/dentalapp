@@ -6,17 +6,17 @@ import Badge from '../components/Badge';
 import {getAvatarColor} from '../utils/getAvatarColor';
 
 const Appointment = ({navigate, item}) => {
-  const {user, diagnosis, active, time} = item;
-  const avatarColors = getAvatarColor(user.fullname.toUpperCase());
+  const {clientId: client, diagnosis, active, time} = item;
+  const avatarColors = getAvatarColor(client.fullname.toUpperCase());
   return (
-    <GroupItem onPress={navigate.bind(this, 'Client', item)}>
+    <GroupItem onPress={() => navigate('Client', {id: client._id})}>
       <Avatar style={{backgroundColor: avatarColors.background}}>
         <Letter style={{color: avatarColors.color}}>
-          {user.fullname[0].toUpperCase()}
+          {client.fullname[0].toUpperCase()}
         </Letter>
       </Avatar>
       <View style={{flex: 1}}>
-        <FullName>{user.fullname}</FullName>
+        <FullName>{client.fullname}</FullName>
         <GrayText>{diagnosis}</GrayText>
       </View>
       <Badge active={active}>{time}</Badge>

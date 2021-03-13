@@ -1,14 +1,28 @@
 import React, {useState} from 'react';
-import {View} from 'react-native';
 import {Input, Item, Label} from 'native-base';
 import Button from '../components/Button';
 import Container from '../components/Container';
 import styled from 'styled-components';
 import {appointmentsApi} from '../utils/api';
-import DatePicker from 'react-native-datepicker';
+import {Layout} from '../components/Layout/Layout';
+import {DateInput} from '../components/DateInput/DateInput';
+import {TimeInput} from '../components/TimeInput/TimeInput';
+
+const emptyAppointment = {
+  clientId: '',
+  diagnosis: '',
+  procedure: '',
+  price: '0',
+  date: new Date(),
+  time: new Date(),
+};
 
 const AddAppointmentScreen = ({navigation}) => {
-  const [values, setValues] = useState({});
+  const clientId = navigation.getParam('clientId');
+  const [values, setValues] = useState({
+    ...emptyAppointment,
+    clientId,
+  });
   const handleChange = (name, e) => {
     const text = e.nativeEvent.text;
     setValues({
@@ -21,16 +35,16 @@ const AddAppointmentScreen = ({navigation}) => {
     appointmentsApi
       .add(values)
       .then(() => {
-        navigation.navigate('Home');
+        navigation.navigate('Client', {id: clientId});
         alert('Ok');
       })
-      .catch(() => {
-        alert('Bad');
+      .catch((err) => {
+        alert(err);
       });
   };
 
   return (
-    <View style={{flex: 1, justifyContent: 'center'}}>
+    <Layout navigation={navigation} justifyContent="center" scrollable={false}>
       <Container
         style={{
           flex: 1,
@@ -40,8 +54,8 @@ const AddAppointmentScreen = ({navigation}) => {
         <Item floatingLabel style={{flex: 1}}>
           <Label>Процедура</Label>
           <Input
-            onChange={handleChange.bind(this, 'dentNumber')}
-            value={values.fullname}
+            onChange={handleChange.bind(this, 'procedure')}
+            value={values.procedure}
             style={{marginTop: 20}}
           />
         </Item>
@@ -49,7 +63,7 @@ const AddAppointmentScreen = ({navigation}) => {
           <Label>Диагноз</Label>
           <Input
             onChange={handleChange.bind(this, 'diagnosis')}
-            value={values.phone}
+            value={values.diagnosis}
             style={{marginTop: 20}}
           />
         </Item>
@@ -57,59 +71,21 @@ const AddAppointmentScreen = ({navigation}) => {
           <Label>Цена</Label>
           <Input
             onChange={handleChange.bind(this, 'price')}
-            value={values.phone}
+            value={values.price}
             keyboardType="numeric"
             style={{marginTop: 20}}
           />
         </Item>
         <Item style={{marginTop: 20, marginLeft: 0}}>
           <TimeRow>
-            <View style={{flex: 1}}>
-              <DatePicker
-                date={new Date()}
-                mode="date"
-                placeholder="Дата"
-                format="YYYY-MM-DD"
-                minDate={new Date()}
-                confirmBtnText="Сохранить"
-                cancelBtnText="Отмена"
-                showIcon={false}
-                customStyles={{
-                  dateInput: {
-                    borderWidth: 0,
-                  },
-                  dateText: {
-                    fontSize: 20,
-                  },
-                }}
-                onDateChange={(date) => {
-                  this.setState({date: date});
-                }}
-              />
-            </View>
-            <View style={{flex: 1}}>
-              <DatePicker
-                date={new Date()}
-                mode="time"
-                placeholder="Время"
-                format="HH:mm"
-                minDate={new Date()}
-                confirmBtnText="Сохранить"
-                cancelBtnText="Отмена"
-                showIcon={false}
-                customStyles={{
-                  dateInput: {
-                    borderWidth: 0,
-                  },
-                  dateText: {
-                    fontSize: 20,
-                  },
-                }}
-                onDateChange={(time) => {
-                  this.setState({date: time});
-                }}
-              />
-            </View>
+            <DateInput
+              date={values.date}
+              onChange={(date) => setValues({...values, date})}
+            />
+            <TimeInput
+              time={values.time}
+              onChange={(time) => setValues({...values, time})}
+            />
           </TimeRow>
         </Item>
         <ButtonView>
@@ -118,7 +94,7 @@ const AddAppointmentScreen = ({navigation}) => {
           </Button>
         </ButtonView>
       </Container>
-    </View>
+    </Layout>
   );
 };
 

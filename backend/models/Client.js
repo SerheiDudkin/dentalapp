@@ -8,7 +8,8 @@ const ClientSchema = new Schema(
     phone: String,
 },
     {
-        timestamps: true
+        timestamps: true,
+
     });
 
 ClientSchema.virtual('appointments',{

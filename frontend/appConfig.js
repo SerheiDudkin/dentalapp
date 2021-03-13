@@ -1,3 +1,3 @@
 export const appConfig = {
-  apiUrl: 'http://172.20.10.9:6666',
+  apiUrl: 'http://192.168.20.249:6666',
 };
