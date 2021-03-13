@@ -4,18 +4,18 @@ import {clientsApi} from '../utils/api';
 import {ScrollView, TouchableOpacity} from 'react-native';
 import PlusButton from '../components/PlusButton';
 import {Layout} from '../components/Layout/Layout';
+import {connect, useDispatch} from 'react-redux';
+import {clientsLoaded, clientsLoadFailed} from './store/client-actions';
 
-export const ClientsScreen = ({navigation}) => {
-  const [clients, setClients] = useState([]);
-  const [err, setErr] = useState();
+const ClientsScreenComponent = ({navigation, clients, error}) => {
+  const dispatch = useDispatch();
 
   const fetchClients = () => {
     clientsApi
       .get()
-      .then(({data: {data}}) => setClients(data))
-      .catch((error) => {
-        console.log(error);
-        setErr(JSON.stringify(error));
+      .then(({data: {data}}) => dispatch(clientsLoaded(data)))
+      .catch((err) => {
+        dispatch(clientsLoadFailed(JSON.stringify(err)));
       });
   };
 
@@ -24,7 +24,7 @@ export const ClientsScreen = ({navigation}) => {
   return (
     <>
       <Layout navigation={navigation} plusRoute="AddClient">
-        {err && <Text>{err}</Text>}
+        {error && <Text>{error}</Text>}
         {clients.map((client) => (
           <TouchableOpacity
             key={`client-id-${client._id}`}
@@ -50,3 +50,8 @@ export const ClientsScreen = ({navigation}) => {
     </>
   );
 };
+const mapStateToProps = ({clients}) => ({
+  clients: clients.items,
+  error: clients.error,
+});
+export const ClientsScreen = connect(mapStateToProps)(ClientsScreenComponent);
