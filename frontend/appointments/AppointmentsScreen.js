@@ -1,31 +1,36 @@
-import React, {useEffect, useState} from 'react';
-import {View, Text} from 'react-native';
+import React, {useEffect} from 'react';
+import {Text, View} from 'react-native';
 import Appointment from '../components/Appointment';
-import SectionTitle from '../components/SectionTitle';
 import styled from 'styled-components';
-import {SectionList} from 'react-native';
 import Swipeable from 'react-native-swipeable-row';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {appointmentsApi} from '../utils/api';
-import PlusButton from '../components/PlusButton';
 import {alert} from 'react-native/Libraries/Alert/Alert';
 import {Layout} from '../components/Layout/Layout';
+import {connect, useDispatch} from 'react-redux';
+import {
+  appointmentsLoad,
+  appointmentsLoaded,
+  appointmentsLoadFailed,
+} from './store/appointments-actions';
 
-const AppointmentsScreen = ({navigation}) => {
-  const [appointments, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-
+const AppointmentsScreenComponent = ({
+  navigation,
+  appointments,
+  error,
+  isLoading,
+}) => {
+  const dispatch = useDispatch();
   const fetchAppointments = () => {
-    setIsLoading(true);
+    dispatch(appointmentsLoad());
     appointmentsApi
       .get()
-      .then(({data}) => {
-        setData(data.data);
-        setIsLoading(false);
+      .then(({data: {data}}) => {
+        dispatch(appointmentsLoaded(data));
       })
-      .catch((e) => {
-        setIsLoading(false);
+      .catch((err) => {
+        dispatch(appointmentsLoadFailed(err));
       });
   };
   useEffect(fetchAppointments, []);
@@ -43,24 +48,16 @@ const AppointmentsScreen = ({navigation}) => {
         {
           text: 'Удалить',
           onPress: () => {
-            setIsLoading(true);
-            appointmentsApi
-              .remove(id)
-              .then(() => {
-                fetchAppointments();
-              })
-              .catch(() => {
-                setIsLoading(false);
-              });
+            appointmentsApi.remove(id).then(fetchAppointments);
           },
         },
       ],
       {cancelable: false},
     );
   };
-  console.log(appointments.length);
+
   return (
-    <Layout navigation={navigation} isLoading={isLoading}>
+    <Layout navigation={navigation} isLoading={isLoading} error={error}>
       {appointments.length > 0 &&
         appointments.map((appointment) => (
           <Swipeable
@@ -85,6 +82,15 @@ const AppointmentsScreen = ({navigation}) => {
     </Layout>
   );
 };
+
+const mapStateToProps = ({appointments}) => ({
+  appointments: appointments.items,
+  error: appointments.error,
+  isLoading: appointments.isLoading,
+});
+export const AppointmentsScreen = connect(mapStateToProps)(
+  AppointmentsScreenComponent,
+);
 
 AppointmentsScreen.navigationOptions = {
   title: 'Журнал клиентов',

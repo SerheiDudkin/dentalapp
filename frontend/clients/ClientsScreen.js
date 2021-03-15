@@ -4,18 +4,18 @@ import {clientsApi} from '../utils/api';
 import {ScrollView, TouchableOpacity} from 'react-native';
 import PlusButton from '../components/PlusButton';
 import {Layout} from '../components/Layout/Layout';
+import {connect, useDispatch} from 'react-redux';
+import {clientsLoaded, clientsLoadFailed} from './store/clients-actions';
 
-export const ClientsScreen = ({navigation}) => {
-  const [clients, setClients] = useState([]);
-  const [err, setErr] = useState();
+const ClientsScreenComponent = ({navigation, clients, error}) => {
+  const dispatch = useDispatch();
 
   const fetchClients = () => {
     clientsApi
       .get()
-      .then(({data: {data}}) => setClients(data))
-      .catch((error) => {
-        console.log(error);
-        setErr(JSON.stringify(error));
+      .then(({data: {data}}) => dispatch(clientsLoaded(data)))
+      .catch((err) => {
+        dispatch(clientsLoadFailed(JSON.stringify(err)));
       });
   };
 
@@ -23,8 +23,7 @@ export const ClientsScreen = ({navigation}) => {
 
   return (
     <>
-      <Layout navigation={navigation} plusRoute="AddClient">
-        {err && <Text>{err}</Text>}
+      <Layout navigation={navigation} plusRoute="AddClient" error={error}>
         {clients.map((client) => (
           <TouchableOpacity
             key={`client-id-${client._id}`}
@@ -32,7 +31,7 @@ export const ClientsScreen = ({navigation}) => {
             <View
               style={{
                 margin: 5,
-                backgroundColor: 'lightgray',
+                backgroundColor: 'lightblue',
                 borderRadius: 5,
                 flex: 1,
                 alignItems: 'flex-start',
@@ -41,7 +40,9 @@ export const ClientsScreen = ({navigation}) => {
                 paddingLeft: 20,
                 paddingRight: 20,
               }}>
-              <Text style={{fontSize: 20}}>{client.fullname}</Text>
+              <Text style={{fontSize: 20, color: 'blue'}}>
+                {client.fullname}
+              </Text>
               <Text style={{fontSize: 20}}>{client.phone}</Text>
             </View>
           </TouchableOpacity>
@@ -50,3 +51,8 @@ export const ClientsScreen = ({navigation}) => {
     </>
   );
 };
+const mapStateToProps = ({clients}) => ({
+  clients: clients.items,
+  error: clients.error,
+});
+export const ClientsScreen = connect(mapStateToProps)(ClientsScreenComponent);

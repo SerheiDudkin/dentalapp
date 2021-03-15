@@ -8,6 +8,8 @@ import {
   AddAppointmentScreen,
   ClientsScreen,
 } from './screens';
+import {Provider} from 'react-redux';
+import {store} from './store/store';
 
 const AppNavigator = createStackNavigator(
   {
@@ -45,4 +47,9 @@ const AppNavigator = createStackNavigator(
   },
 );
 
-export default createAppContainer(AppNavigator);
+export const AppContainer = createAppContainer(AppNavigator);
+export const App = () => (
+  <Provider store={store}>
+    <AppContainer />
+  </Provider>
+);
