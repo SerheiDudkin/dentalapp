@@ -6,44 +6,51 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {clientsApi, appointmentsApi} from '../utils/api';
 import {Badge, Button, Container, GrayText, PlusButton} from '../components';
 import {Layout} from '../components/Layout/Layout';
+import {connect, useDispatch} from 'react-redux';
+import {
+  clientAppointmentsLoad,
+  clientAppointmentsLoaded,
+  clientAppointmentsLoadFailed,
+  clientLoad,
+  clientLoaded,
+  clientLoadFailed,
+} from './store/client-action';
 
-const ClientScreen = ({navigation}) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingAppointments, setIsLoadingAppointments] = useState(true);
-  const [appointments, setAppointments] = useState([]);
-  const [err, setErr] = useState(null);
-  const [client, setClient] = useState(null);
+const ClientScreenComponent = ({
+  navigation,
+  client,
+  error,
+  isLoading,
+  appointmentsState,
+}) => {
+  const dispatch = useDispatch();
   const clientId = navigation.getParam('id');
-
-  useEffect(() => {
-    setIsLoading(true);
+  const fetchClient = () => {
+    dispatch(clientLoad(clientId));
     clientsApi
       .show(clientId)
-      .then(({data: {data}}) => setClient(data))
-      .catch((error) => setErr(JSON.stringify(error)))
-      .finally(() => setIsLoading(false));
-  }, [clientId]);
+      .then(({data: {data}}) => {
+        dispatch(clientLoaded(data));
+        dispatch(clientAppointmentsLoad(clientId));
+        appointmentsApi
+          .show(clientId)
+          .then(({data: {data: appointments}}) =>
+            dispatch(clientAppointmentsLoaded(appointments)),
+          )
+          .catch((err) => dispatch(clientAppointmentsLoadFailed(err)));
+      })
+      .catch((err) => {
+        dispatch(clientLoadFailed(JSON.stringify(err)));
+      });
+  };
+  useEffect(fetchClient, [clientId]);
 
-  useEffect(() => {
-    setIsLoadingAppointments(true);
-    appointmentsApi
-      .show(clientId)
-      .then(({data: {data}}) => setAppointments(data))
-      .catch((error) => setErr(JSON.stringify(error)))
-      .finally(setIsLoadingAppointments(false));
-  }, [clientId]);
-
-  console.log({client});
   return (
     <Layout
       navigation={navigation}
       plusRoute="AddAppointment"
-      plusParams={{clientId}}>
-      {err && (
-        <View>
-          <Text>{err}</Text>
-        </View>
-      )}
+      plusParams={{clientId}}
+      error={error}>
       {isLoading ? (
         <ActivityIndicator size="large" color="2A86FF" />
       ) : (
@@ -67,11 +74,14 @@ const ClientScreen = ({navigation}) => {
           </ClientDetails>
 
           <ClientAppointments>
-            {isLoadingAppointments && false ? (
+            {appointmentsState.error && (
+              <Text>Ошибка {appointmentsState.error}</Text>
+            )}
+            {appointmentsState.isLoading ? (
               <ActivityIndicator size="large" color="2A86FF" />
             ) : (
               <Container>
-                {appointments.map((appointment) => (
+                {appointmentsState.items.map((appointment) => (
                   <AppointmentCard key={appointment._id}>
                     <MoreButton>
                       <FontAwesome5
@@ -121,6 +131,15 @@ const ClientScreen = ({navigation}) => {
     </Layout>
   );
 };
+
+const mapStateToProps = ({client}) => ({
+  client: client.item,
+  error: client.error,
+  isLoading: client.isLoading,
+  appointmentsState: client.appointments,
+});
+
+export const ClientScreen = connect(mapStateToProps)(ClientScreenComponent);
 
 const MoreButton = styled.TouchableOpacity`
   position: absolute;

@@ -5,7 +5,7 @@ import {ScrollView, TouchableOpacity} from 'react-native';
 import PlusButton from '../components/PlusButton';
 import {Layout} from '../components/Layout/Layout';
 import {connect, useDispatch} from 'react-redux';
-import {clientsLoaded, clientsLoadFailed} from './store/client-actions';
+import {clientsLoaded, clientsLoadFailed} from './store/clients-actions';
 
 const ClientsScreenComponent = ({navigation, clients, error}) => {
   const dispatch = useDispatch();
@@ -23,8 +23,7 @@ const ClientsScreenComponent = ({navigation, clients, error}) => {
 
   return (
     <>
-      <Layout navigation={navigation} plusRoute="AddClient">
-        {error && <Text>{error}</Text>}
+      <Layout navigation={navigation} plusRoute="AddClient" error={error}>
         {clients.map((client) => (
           <TouchableOpacity
             key={`client-id-${client._id}`}
@@ -32,7 +31,7 @@ const ClientsScreenComponent = ({navigation, clients, error}) => {
             <View
               style={{
                 margin: 5,
-                backgroundColor: 'lightgray',
+                backgroundColor: 'lightblue',
                 borderRadius: 5,
                 flex: 1,
                 alignItems: 'flex-start',
@@ -41,7 +40,9 @@ const ClientsScreenComponent = ({navigation, clients, error}) => {
                 paddingLeft: 20,
                 paddingRight: 20,
               }}>
-              <Text style={{fontSize: 20}}>{client.fullname}</Text>
+              <Text style={{fontSize: 20, color: 'blue'}}>
+                {client.fullname}
+              </Text>
               <Text style={{fontSize: 20}}>{client.phone}</Text>
             </View>
           </TouchableOpacity>
