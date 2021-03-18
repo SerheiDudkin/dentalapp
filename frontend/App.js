@@ -16,8 +16,8 @@ const AppNavigator = createStackNavigator(
     Appointments: {
       screen: AppointmentsScreen,
       navigationOptions: {
-        title: 'Журнал клиентов',
-        headerTintColor: '#2A86ff',
+        title: 'Журнал приемов',
+        headerTintColor: 'blue',
         headerTransparent: false,
         headerStyle: {
           elevation: 0.8,
@@ -32,7 +32,15 @@ const AppNavigator = createStackNavigator(
     Clients: {
       screen: ClientsScreen,
       navigationOptions: {
-        cardOverlayEnabled: false,
+        title: 'Клиенты',
+        headerTintColor: 'blue',
+        headerTransparent: false,
+        headerStyle: {
+          elevation: 0.8,
+          shadowOpacity: 0.8,
+          backgroundColor: '#F2F2F2',
+          cardOverlayEnabled: false,
+        },
       },
     },
     AddAppointment: {

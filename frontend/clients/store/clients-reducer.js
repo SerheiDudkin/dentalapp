@@ -13,6 +13,7 @@ export const clientsReducer = (state = clientsInitialState, action) => {
         ...state,
         items: [],
         error: action.error,
+        isLoading: true,
       };
     default:
       return state;

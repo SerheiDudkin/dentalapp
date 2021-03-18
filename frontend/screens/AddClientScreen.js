@@ -1,14 +1,15 @@
 import React, {useState} from 'react';
-import {Text, View} from 'react-native';
-import {Form, Item, Input, Label} from 'native-base';
+import {Input, Item, Label} from 'native-base';
 import Button from '../components/Button';
 import Container from '../components/Container';
 import styled from 'styled-components';
-import Icon from 'react-native-vector-icons/Ionicons';
 import {clientsApi} from '../utils/api';
 import {Layout} from '../components/Layout/Layout';
+import {useDispatch} from 'react-redux';
+import {clientsLoad} from '../clients/store/clients-actions';
 
 const AddClientScreen = ({navigation}) => {
+  const dispatch = useDispatch();
   const [values, setValues] = useState({});
   const handleChange = (name, e) => {
     const text = e.nativeEvent.text;
@@ -27,6 +28,7 @@ const AddClientScreen = ({navigation}) => {
             data: {_id: id},
           },
         }) => {
+          dispatch(clientsLoad());
           navigation.navigate('Client', {id});
           alert('Ok');
         },

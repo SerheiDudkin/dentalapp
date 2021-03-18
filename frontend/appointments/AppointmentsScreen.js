@@ -4,15 +4,12 @@ import Appointment from '../components/Appointment';
 import styled from 'styled-components';
 import Swipeable from 'react-native-swipeable-row';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import {appointmentsApi} from '../utils/api';
 import {alert} from 'react-native/Libraries/Alert/Alert';
 import {Layout} from '../components/Layout/Layout';
 import {connect, useDispatch} from 'react-redux';
 import {
+  appointmentRemove,
   appointmentsLoad,
-  appointmentsLoaded,
-  appointmentsLoadFailed,
 } from './store/appointments-actions';
 
 const AppointmentsScreenComponent = ({
@@ -22,18 +19,8 @@ const AppointmentsScreenComponent = ({
   isLoading,
 }) => {
   const dispatch = useDispatch();
-  const fetchAppointments = () => {
-    dispatch(appointmentsLoad());
-    appointmentsApi
-      .get()
-      .then(({data: {data}}) => {
-        dispatch(appointmentsLoaded(data));
-      })
-      .catch((err) => {
-        dispatch(appointmentsLoadFailed(err));
-      });
-  };
-  useEffect(fetchAppointments, []);
+
+  useEffect(() => dispatch(appointmentsLoad()), [dispatch]);
 
   const removeAppointment = (id) => {
     alert(
@@ -48,7 +35,7 @@ const AppointmentsScreenComponent = ({
         {
           text: 'Удалить',
           onPress: () => {
-            appointmentsApi.remove(id).then(fetchAppointments);
+            dispatch(appointmentRemove(id));
           },
         },
       ],
@@ -62,9 +49,9 @@ const AppointmentsScreenComponent = ({
         appointments.map((appointment) => (
           <Swipeable
             rightButtons={[
-              <SwipeViewButton style={{backgroundColor: '#B4C1CB'}}>
-                <AntDesign name="edit" size={40} color={'white'} />
-              </SwipeViewButton>,
+              // <SwipeViewButton style={{backgroundColor: '#B4C1CB'}}>
+              //   <AntDesign name="edit" size={40} color={'white'} />
+              // </SwipeViewButton>,
               <SwipeViewButton
                 onPress={removeAppointment.bind(this, appointment._id)}
                 style={{backgroundColor: '#F85A5A'}}>
@@ -93,7 +80,7 @@ export const AppointmentsScreen = connect(mapStateToProps)(
 );
 
 AppointmentsScreen.navigationOptions = {
-  title: 'Журнал клиентов',
+  title: 'Журнал приемов',
   headerTintColor: '#2A86FF',
   headerStyle: {
     elevation: 0.8,

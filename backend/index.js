@@ -23,7 +23,7 @@ app.patch("/appointments/:id", appointmentValidation.update, AppointmentCtrl.upd
 
 app.listen(6666, function(err) {
     if (err) {
-      return console.log(err);]]
+      return console.log(err);
     }
     console.log('Server runned!');
 });

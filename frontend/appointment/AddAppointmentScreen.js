@@ -7,17 +7,20 @@ import {appointmentsApi} from '../utils/api';
 import {Layout} from '../components/Layout/Layout';
 import {DateInput} from '../components/DateInput/DateInput';
 import {TimeInput} from '../components/TimeInput/TimeInput';
+import {useDispatch} from 'react-redux';
+import {clientAppointmentsLoad} from '../client/store/client-action';
 
 const emptyAppointment = {
   clientId: '',
   diagnosis: '',
   procedure: '',
-  price: '0',
+  price: '',
   date: new Date(),
   time: new Date(),
 };
 
 const AddAppointmentScreen = ({navigation}) => {
+  const dispatch = useDispatch();
   const clientId = navigation.getParam('clientId');
   const [values, setValues] = useState({
     ...emptyAppointment,
@@ -36,7 +39,7 @@ const AddAppointmentScreen = ({navigation}) => {
       .add(values)
       .then(() => {
         navigation.navigate('Client', {id: clientId});
-        alert('Ok');
+        dispatch(clientAppointmentsLoad(clientId));
       })
       .catch((err) => {
         alert(err);

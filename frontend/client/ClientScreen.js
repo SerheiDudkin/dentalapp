@@ -1,20 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, Text, View, Linking} from 'react-native';
+import React, {useEffect} from 'react';
+import {ActivityIndicator, Linking, Text} from 'react-native';
 import styled from 'styled-components';
 import Icon from 'react-native-vector-icons/Ionicons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import {clientsApi, appointmentsApi} from '../utils/api';
-import {Badge, Button, Container, GrayText, PlusButton} from '../components';
+import {Badge, Button, Container, GrayText} from '../components';
 import {Layout} from '../components/Layout/Layout';
 import {connect, useDispatch} from 'react-redux';
-import {
-  clientAppointmentsLoad,
-  clientAppointmentsLoaded,
-  clientAppointmentsLoadFailed,
-  clientLoad,
-  clientLoaded,
-  clientLoadFailed,
-} from './store/client-action';
+import {clientAppointmentsLoad, clientLoad} from './store/client-action';
 
 const ClientScreenComponent = ({
   navigation,
@@ -25,25 +17,10 @@ const ClientScreenComponent = ({
 }) => {
   const dispatch = useDispatch();
   const clientId = navigation.getParam('id');
-  const fetchClient = () => {
+  useEffect(() => {
     dispatch(clientLoad(clientId));
-    clientsApi
-      .show(clientId)
-      .then(({data: {data}}) => {
-        dispatch(clientLoaded(data));
-        dispatch(clientAppointmentsLoad(clientId));
-        appointmentsApi
-          .show(clientId)
-          .then(({data: {data: appointments}}) =>
-            dispatch(clientAppointmentsLoaded(appointments)),
-          )
-          .catch((err) => dispatch(clientAppointmentsLoadFailed(err)));
-      })
-      .catch((err) => {
-        dispatch(clientLoadFailed(JSON.stringify(err)));
-      });
-  };
-  useEffect(fetchClient, [clientId]);
+    dispatch(clientAppointmentsLoad(clientId));
+  }, [dispatch, clientId]);
 
   return (
     <Layout
@@ -119,7 +96,7 @@ const ClientScreenComponent = ({
                       <Badge style={{width: 155}} active>
                         {appointment.date} - {appointment.time}
                       </Badge>
-                      <Badge color="green">{appointment.balance}</Badge>
+                      <Badge color="green">{appointment.price}</Badge>
                     </AppointmentCardRow>
                   </AppointmentCard>
                 ))}
