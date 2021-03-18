@@ -1,25 +1,13 @@
-import React, {useEffect, useState} from 'react';
-import {Text, View} from 'react-native';
-import {clientsApi} from '../utils/api';
-import {ScrollView, TouchableOpacity} from 'react-native';
-import PlusButton from '../components/PlusButton';
+import React, {useEffect} from 'react';
+import {Text, TouchableOpacity, View} from 'react-native';
 import {Layout} from '../components/Layout/Layout';
 import {connect, useDispatch} from 'react-redux';
-import {clientsLoaded, clientsLoadFailed} from './store/clients-actions';
+import {clientsLoad} from './store/clients-actions';
 
 const ClientsScreenComponent = ({navigation, clients, error}) => {
   const dispatch = useDispatch();
 
-  const fetchClients = () => {
-    clientsApi
-      .get()
-      .then(({data: {data}}) => dispatch(clientsLoaded(data)))
-      .catch((err) => {
-        dispatch(clientsLoadFailed(JSON.stringify(err)));
-      });
-  };
-
-  useEffect(fetchClients, []);
+  useEffect(() => dispatch(clientsLoad()), [dispatch]);
 
   return (
     <>
@@ -30,7 +18,7 @@ const ClientsScreenComponent = ({navigation, clients, error}) => {
             onPress={() => navigation.navigate('Client', {id: client._id})}>
             <View
               style={{
-                margin: 5,
+                margin: 1,
                 backgroundColor: 'lightblue',
                 borderRadius: 5,
                 flex: 1,

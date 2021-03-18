@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, StatusBar} from 'react-native';
+import {View} from 'react-native';
 import styled from 'styled-components';
 import GrayText from '../components/GrayText';
 import Badge from '../components/Badge';
