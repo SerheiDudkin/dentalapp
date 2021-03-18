@@ -6,7 +6,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {Badge, Button, Container, GrayText} from '../components';
 import {Layout} from '../components/Layout/Layout';
 import {connect, useDispatch} from 'react-redux';
-import {clientAppointmentsLoad, clientLoad} from './store/client-action';
+import {clientAppointmentsLoad, clientLoad} from './store/client-actions';
 
 const ClientScreenComponent = ({
   navigation,

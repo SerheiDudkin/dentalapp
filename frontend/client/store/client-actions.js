@@ -1,4 +1,5 @@
 import {appointmentsApi, clientsApi} from '../../utils/api';
+import {clientsLoad} from '../../clients/store/clients-actions';
 
 export const clientLoadAction = (id) => ({
   type: 'CLIENT_LOAD',
@@ -51,3 +52,22 @@ export const clientAppointmentsLoadFailed = (error) => ({
   type: 'CLIENT_APPOINTMENTS_LOAD_FAILED',
   error,
 });
+
+export const clientAdd = (client, navigation) => (dispatch) => {
+  clientsApi
+    .add(client)
+    .then(
+      ({
+        data: {
+          data: {_id: id},
+        },
+      }) => {
+        dispatch(clientsLoad());
+        navigation.navigate('Client', {id});
+        alert('Ok');
+      },
+    )
+    .catch(() => {
+      alert('Bad');
+    });
+};

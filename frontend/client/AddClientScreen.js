@@ -3,10 +3,9 @@ import {Input, Item, Label} from 'native-base';
 import Button from '../components/Button';
 import Container from '../components/Container';
 import styled from 'styled-components';
-import {clientsApi} from '../utils/api';
 import {Layout} from '../components/Layout/Layout';
 import {useDispatch} from 'react-redux';
-import {clientsLoad} from '../clients/store/clients-actions';
+import {clientAdd} from './store/client-actions';
 
 const AddClientScreen = ({navigation}) => {
   const dispatch = useDispatch();
@@ -20,22 +19,7 @@ const AddClientScreen = ({navigation}) => {
   };
 
   const onSubmit = () => {
-    clientsApi
-      .add(values)
-      .then(
-        ({
-          data: {
-            data: {_id: id},
-          },
-        }) => {
-          dispatch(clientsLoad());
-          navigation.navigate('Client', {id});
-          alert('Ok');
-        },
-      )
-      .catch(() => {
-        alert('Bad');
-      });
+    dispatch(clientAdd(values, navigation));
   };
 
   return (

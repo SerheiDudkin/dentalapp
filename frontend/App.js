@@ -1,15 +1,13 @@
 import React from 'react';
 import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
-import {
-  AppointmentsScreen,
-  ClientScreen,
-  AddClientScreen,
-  AddAppointmentScreen,
-  ClientsScreen,
-} from './screens';
 import {Provider} from 'react-redux';
 import {store} from './store/store';
+import AppointmentsScreen from './appointments/AppointmentsScreen';
+import ClientScreen from './client/ClientScreen';
+import {ClientsScreen} from './clients/ClientsScreen';
+import AddAppointmentScreen from './appointment/AddAppointmentScreen';
+import AddClientScreen from './client/AddClientScreen';
 
 const AppNavigator = createStackNavigator(
   {

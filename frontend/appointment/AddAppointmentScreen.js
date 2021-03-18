@@ -8,7 +8,8 @@ import {Layout} from '../components/Layout/Layout';
 import {DateInput} from '../components/DateInput/DateInput';
 import {TimeInput} from '../components/TimeInput/TimeInput';
 import {useDispatch} from 'react-redux';
-import {clientAppointmentsLoad} from '../client/store/client-action';
+import {clientAppointmentsLoad} from '../client/store/client-actions';
+import {appointmentAdd} from './store/appointment-actions';
 
 const emptyAppointment = {
   clientId: '',
@@ -35,15 +36,7 @@ const AddAppointmentScreen = ({navigation}) => {
   };
 
   const onSubmit = () => {
-    appointmentsApi
-      .add(values)
-      .then(() => {
-        navigation.navigate('Client', {id: clientId});
-        dispatch(clientAppointmentsLoad(clientId));
-      })
-      .catch((err) => {
-        alert(err);
-      });
+    dispatch(appointmentAdd(clientId, values, navigation));
   };
 
   return (
